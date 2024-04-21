@@ -2,6 +2,7 @@
 
 These are the my main takeaways and notes from the Complete Intro to Containers [course](https://btholt.github.io/complete-intro-to-containers/) by Brian Holt that I would like to have easy access in the future should I need them.
 
+
 ## Intro
 
 Bear-metal servers, VMs and containers.
@@ -29,13 +30,15 @@ Ps: it's possible to configure docker to run on Linux using a virtual machine ba
 
 
 
-_For the following examples I'll be using a docker container as my computer is a macos, thus not a linux based OS. If I were on a linux based computer, I could run the examples directly on the host computer._
+_For the following academic examples I'll be using a docker container as my computer is a macos, thus not a linux based OS. If I were on a linux based computer, I could run the examples directly on the host computer. `docker run -it --name docker-host --rm --privileged ubuntu:bionic`_
 
 ### chroot (charoot or change root or linux jails)
 
 This is the operation / utility that allows you to change the root directory for a process and its children - it's known as jailed process as it restricts the process so that it can only see what is inside the specifiec directory, nothing outisde. 
 
 When you run a process within a `chroot` environment, the process sees a modified file system hierarchy where the specified directory becomes the root (`/`) directory.
+
+_chroot is about sharing file system - 2 chrooted processes still can see each other's via ps and manage them (kill, sigint, etc)_
 
 #### Showcasing chroot
 
@@ -69,5 +72,69 @@ chroot . bash # or chroot my-new-root/ bash
 ```
 
 _In order to discover which linux distro and version you are running, run the command `cat /etc/issue`_
+
+
+Instead of going and checking and handcopying all the necessary tools, modules and libraries, it's possible to create a valid and changerootable environment with a tool called `debootstrap` (DEbian BOOT STRAP), which bootstraps a directory already with what you need:
+
+```bash
+
+apt update
+
+apt install debootstrap -y
+
+debootstrap --variant=minbase bionic /my-directory-root 
+# --variant=minbase creates the environment with the most minimal tools that you will possibly need to run a debian based ubuntu
+# tells the type of ubuntu (or debian) you want
+# last parameter is the name of the wanted directory
+
+chroot /my-directory-root bash
+
+# ls, cd, cp, all work out of the box
+
+```
+
+
+### namespaces
+
+This is the operation / utility to limit processes to not see or interfere others - which is essential for containerisation. They get their own process ids, get their own networking layer, etc.
+
+
+_Namespaces is about sharing capabilities or controlling the capabilities that flow into processes_
+
+#### Showcasing namespaces
+
+Problem illustration:
+
+On a running container, create a file and tail it with -f to create a long running process: `tail -f {file}`.
+
+On a new shell (emulator), connect (or attach) to the previously created and running docker `docker exec -it {container id / name} bash` - this opens another shell in the same container. On this shell, type `ps aux`. Amongst the processes, you can find the tail process and kill it (`kill -9 {pid}`).
+
+
+Solution:
+
+Unshare all the resources that you don't want the new process(es) to have access (or shared access) using the tool... `unshare`. Like unshare the network, unshare the filesystem, unshare the UTS (process managing system), etc.
+
+`unshare --mount --uts --ipc --net --pid --fork --user --map-root-user chroot /desired-new-root bash` after the flags you just tell what you want to run with that unshare. In this case, chroot pointing to the desired new root dictory and with which shell.
+
+_Each flag above is a namespace._
+
+After running the previous command, `ps aux` won't return other's processes. It's necessary to mount some things tho to let the environment know it can access the process system and file system:
+
+```
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t tmpfs none /tmp
+```
+
+_Now the process spawned above would be truly containerised and if access to the network was needed, it would actually be necessary to create a separate network, which would connect to a broader network._
+
+
+
+
+
+
+
+
+
 
 

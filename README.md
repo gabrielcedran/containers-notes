@@ -1,12 +1,14 @@
 # containers-notes
 
+## Core Concept
+
 In a nutshell, containers are 3 main linux features bundled together: `Jailed Process` (change root / charoot) + `Namespaces` (unshared env) + `cgroups` (control groups).
 
-_running dockers from a docker container: `docker run -it --name {name} --rm --privileged ubuntu:jammy`_
+_running a basic ubuntu container: `docker run -it --name {name} --rm --privileged ubuntu:jammy`_
 
 _attaching to a running docker `docker exec -it {name} bash`_
 
-## Jailed Process / Change Root / Charoot
+### Jailed Process / Change Root / Charoot
 
 It's the action of limiting a given process (and its sub-processes) to a given directory and its sub-directories. That process (or user in this case) wouldn't be able to see anything outside that directory tree.
 
@@ -14,7 +16,7 @@ It's the action of limiting a given process (and its sub-processes) to a given d
 
 For more details about how to create a functional jailed process, follow this [documentation](./chroot/README.md).
 
-## Namespaces
+### Namespaces
 
 It allows the isolation of processes so that one cannot see the other nor meddle with each other. Processes are contained within itself and its sub-processes.
 
@@ -34,7 +36,7 @@ mount -t tmpfs none /tmp
 
 ```
 
-## cgroups - control groups
+### cgroups - control groups
 
 It allows to restrict the amount of resource (memory, cpu, disk, etc) a process can use.
 
@@ -47,3 +49,17 @@ cgroups has an api based on directory and files. The root cgroup resides under `
 3. pids.max
 
 To learn how to implement limitations to processes, read this [file](./cgroups/README.md).
+
+## Running docker inside another docker
+
+Nothing prevents you from running a docker inside another docker (a so on). To do so, create a container and install docker (or even better, use an image which already contains docker)
+
+```sh
+
+docker run -ti -v /var/run/docker.sock:/var/run/docker.sock --privileged --rm --name docker-host docker:26.0.1-cli
+
+docker run -ti -v /var/run/docker.sock:/var/run/docker.sock --privileged --rm --name docker-docker docker:26.0.1-cli
+
+docker run -it --name docker-docker-docker --rm --privileged ubuntu:jammy
+
+```

@@ -33,3 +33,17 @@ mount -t sysfs none /sys
 mount -t tmpfs none /tmp
 
 ```
+
+## cgroups - control groups
+
+It allows to restrict the amount of resource (memory, cpu, disk, etc) a process can use.
+
+The current api is v2 and to check which api your API distro run `grep -c cgroup /proc/mounts`
+
+cgroups has an api based on directory and files. The root cgroup resides under `/sys/fs/cgroup` - notice all the files like:
+
+1. cpu.max
+2. memory.max
+3. pids.max
+
+To learn how to implement limitations to processes, read this [file](./cgroups/README.md).

@@ -13,3 +13,23 @@ It's the action of limiting a given process (and its sub-processes) to a given d
 `chroot /{dir} bash` jails a process under `/{dir}`.
 
 For more details about how to create a functional jailed process, follow this [documentation](./chroot/README.md).
+
+## Namespaces
+
+It allows the isolation of processes so that one cannot see the other nor meddle with each other. Processes are contained within itself and its sub-processes.
+
+To isolate a process, the `unshare` program is used and it takes all the resources it should unshare:
+
+`unshare --mount --uts --ipc --net --pid --fork --user --map-root-user chroot /{dir} bash`
+
+Once a process is unshared, it is necessary mount linux's resources so that is works:
+
+```sh
+
+unshare --mount --uts --ipc --net --pid --fork --user --map-root-user chroot new-complete-root/ bash
+
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t tmpfs none /tmp
+
+```

@@ -64,7 +64,7 @@ echo {pid} > /sys/fs/cgroup/limited-resources/cgroup.procs
 
 ### Points of attention
 
-1: Processes can create subprocesses. Subprocesses are createD in the same cgroup of the parent process, but moving a parent process to another cgroup does not move the sub-process automatically.
+1: Processes can create subprocesses (known as process-tree). Subprocesses are createD in the same cgroup of the parent process, but moving a parent process to another cgroup does not move the sub-process automatically.
 
 If you want to limit the resources a given user can use, it's important to ensure that not only the main process is assigned to the correct cgroup but also all the subprocess that might have already been created.
 

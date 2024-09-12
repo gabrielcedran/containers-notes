@@ -135,7 +135,8 @@ It used to be by fair the most compact linux distribution, therefore became the 
 
 It can be seen like a recipe or manifesto to build an image. It always starts with a `FROM` entry that determines the base image in which you will build yours on top.
 
-Then you can add as many instructions as you want and you usually finish with a `CMD`, which is the default command that gets executed when the container is executed without a custom command.
+Then you can add as many instructions as you want and you usually finish with a `CMD` (which is a string array), which is the default command that gets executed when the
+container is executed without a custom command.
 
 Each command added to your Dockerfile are layers, which are built on top of the base image layers (which could be built on top of another images layers, etc).
 It provides a super powerful caching mechanism that when an image is being (re-)built, only the changed layers have to be reconstructed while the rest can be simply reused - it
@@ -149,3 +150,42 @@ By default, containers do not expose any of their ports (otherwise it'd be a vul
 
 The `EXPOSE` instruction on Dockerfiles is just a suggestion not an enforcement. Running containers in the regular way won't respect the EXPOSE instruction out of the box, (there is a flag to do so).
 However the assigned port on the host is a random one, which turns out not convenient.
+
+### Users
+
+It's not a good practice to execute everything as root user. In case there is a vulnerabity on whatever you are using (e.g python) and somebody manages to exploit that vunerability,
+that means that the running process has root access to do whatever they want in the container.
+
+Some images provide users out of the box (like node images provide the default user `node`). Example:
+
+```Dockerfile
+FROM node:20
+
+USER node
+
+WORKDIR /home/node
+
+COPY --chown=node index.js .
+
+CMD ["node", "index.js"]
+
+```
+
+In case no unprivileged user is provided:
+
+```Dockerfile
+FROM node:20
+
+RUN useradd -ms /bin/bash anotheruser
+
+USER anotheruser
+
+COPY --chown=anotheruser index.js /home/anotheruser/index.js
+
+CMD ["node", "/home/anotheruser/index.js"]
+
+```
+
+### ADD vs COPY
+
+ADD can do a lot more than COPY. It can add remote urls, it automatically unzips files, etc

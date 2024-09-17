@@ -189,3 +189,18 @@ CMD ["node", "/home/anotheruser/index.js"]
 ### ADD vs COPY
 
 ADD can do a lot more than COPY. It can add remote urls, it automatically unzips files, etc
+
+### Production Containers
+
+For production, we want to create containers as small as possible - however we have to be careful to not spend too much time over optimising as at some point it's simply not worth it.
+
+Keeping in your container only the necessary dependencies and tools to reduce the risk of vulnerability.
+
+`Alpine` is a linux distro that is meant to be as small as while still being able to do the basic things like run a webserver - (based on BusyBox).
+
+_do not use alpine anywhere in your tool/develpment chain but in production as you need a full fat distro to avoid having to reinstall all the utility tools_
+
+#### node:20-alpine vs custom alpine (03 vs 04)
+
+The image based on node:20-alpine has roughly 150mb while the fully custom one 90mb. Overall 60mb is nothing in the grand schema of things and we should be wondering why somebody at node or docker
+thought that extra 60mb would be relevant. Are we shaving something important off of the custom container?

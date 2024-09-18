@@ -206,3 +206,11 @@ The image based on node:20-alpine has roughly 150mb while the fully custom one 9
 thought that extra 60mb would be relevant. Are we shaving something important off of the custom container?
 
 **Unnecessary tools:** On both images, npm is currently installed and shipped to production. Does a production app need NPM to run after all the dependencies have been installed?
+
+### Distroless - alpine alternative
+
+You can find a blog post why you may not want to use alpine [here](https://martinheinz.dev/blog/92).
+
+_TL;DR: there're some `extreme` edge cases with Alpine that causes it to have some weird issues with Kubernetes - which not necessarily will affect/happen to you (loads of people run alpine based images on k8s and never run into this issue)_
+
+Besides distroless, there are some other options like `wolfi`, `micro image` and `debian slim`. _PS: distroless is not distroless. It's actually a super stripped debian_

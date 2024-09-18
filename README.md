@@ -214,3 +214,13 @@ You can find a blog post why you may not want to use alpine [here](https://marti
 _TL;DR: there're some `extreme` edge cases with Alpine that causes it to have some weird issues with Kubernetes - which not necessarily will affect/happen to you (loads of people run alpine based images on k8s and never run into this issue)_
 
 Besides distroless, there are some other options like `wolfi`, `micro image` and `debian slim`. _PS: distroless is not distroless. It's actually a super stripped debian_
+
+## Docker Features
+
+### Scout
+
+It's a feature that allows you to inspect your containers for vulnerability, or anything that docker identifies as problematic.
+
+`docker scout quickview {imageName}`
+
+Ps: CVEs are published vulnerabilities (Common Vulnerabilities and Exposures).

@@ -224,3 +224,36 @@ It's a feature that allows you to inspect your containers for vulnerability, or 
 `docker scout quickview {imageName}`
 
 Ps: CVEs are published vulnerabilities (Common Vulnerabilities and Exposures).
+
+### Bind mounts
+
+Bind mounts can be seen as a portal between the container and your local computer so that you can have shared state (and kinda turning containers into 'stateful').
+
+Example:
+
+`docker run --mount type=bind,source="$(pwd)"/07-challenge-nginx-static-asset-project/dist,target=/usr/share/nginx/html -p 8080:80 nginx:latest`
+
+1. In this case, we just want to spin up a nginx and serve the local dist directory to ensure everything is fine.
+2. the mount type is `bind`. There are others.
+
+_be careful with native dependencies. Eg node_modules on a macos with a bind mount to a debian container could have native differences_
+
+### Volumes
+
+Volumes are meant to maintain state between containers runs (so that the next time your it runs, it'll have the previous state / results). It can also be shared between different containers.
+
+**bind mounts are file systems managed by the host while volumes are docker-managed file systems (which are not visible to the host system)**
+
+Example under `08-docker-volume`: It's a node program that reads a file, picks up the number that is there, add 1 and write back to the file.
+
+Running it locally: `node index.js`
+
+Running with volume: `docker run --env DATA_PATH=/app/data/num.txt --mount type=volume,source=incrementer-data,target=/app/data --rm -it volumes-test`
+
+1. `DATA_PATH` is an env variable used by the program
+2. the mount `source` is whatever name you want to give it
+3. the `target` has to match where the program expects it to be
+
+To delete volumes, run `docker volume rm incrementer-data` (and to list `docker volume ls`)
+
+Example with bind mounts: `docker run --env DATA_PATH=/app/data/num.txt --mount type=bind,source="$(pwd)"/08-docker-volume,target=/app/data --rm -it volumes-test`

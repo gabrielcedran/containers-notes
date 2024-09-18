@@ -204,3 +204,5 @@ _do not use alpine anywhere in your tool/develpment chain but in production as y
 
 The image based on node:20-alpine has roughly 150mb while the fully custom one 90mb. Overall 60mb is nothing in the grand schema of things and we should be wondering why somebody at node or docker
 thought that extra 60mb would be relevant. Are we shaving something important off of the custom container?
+
+**Unnecessary tools:** On both images, npm is currently installed and shipped to production. Does a production app need NPM to run after all the dependencies have been installed?

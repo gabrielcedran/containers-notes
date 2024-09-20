@@ -257,3 +257,9 @@ Running with volume: `docker run --env DATA_PATH=/app/data/num.txt --mount type=
 To delete volumes, run `docker volume rm incrementer-data` (and to list `docker volume ls`)
 
 Example with bind mounts: `docker run --env DATA_PATH=/app/data/num.txt --mount type=bind,source="$(pwd)"/08-docker-volume,target=/app/data --rm -it volumes-test`
+
+### Dev Containers
+
+It's a nice feature which has a cool plugin for VS Code and other IDE and editing tools (there is even a dev cli that allows you to use it outside IDEs).
+
+It's worth exploring more about it in the future but in a nutshell, it's a convenient way of booting up a development environment.

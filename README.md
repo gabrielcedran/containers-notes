@@ -263,3 +263,27 @@ Example with bind mounts: `docker run --env DATA_PATH=/app/data/num.txt --mount 
 It's a nice feature which has a cool plugin for VS Code and other IDE and editing tools (there is even a dev cli that allows you to use it outside IDEs).
 
 It's worth exploring more about it in the future but in a nutshell, it's a convenient way of booting up a development environment.
+
+### Network
+
+To list all networks: `docker network ls`. The `bridge` network (not type) is the one that is created by default by docker. You could do everything over `bridge`
+however everything would be able to see everything (not recommended by docker itself).
+
+Custom bridge creation: `docker network create --driver=bridge {network-name}`.
+
+To have a container using that network, simply pass the `--network={network name}` flag to the docker run command: `docker run -d --network={network-name} --name=mongo_db -p 27017:27017 mongo:7`
+
+When creating a new container that needs to connect to another container (for instance an app that connects to the mongo db that the sample above command created),
+in the connection url simply use the other container's name (in the example above, `mongo_db`: `mongodb://mongo_db:27017`).
+
+Complete example (run from 09-networking directory):
+
+```
+docker network create --driver=bridge app-net
+
+docker run -d --network=app-net --name=mongo_db -p 27017:27017 mongo:7
+
+docker build -t app-with-mongo .
+
+docker run -it --rm -p 8080:8080 --network=app-net --env MONGO_CONNECTION_STRING=mongodb://mongo_db:27017 app-with-mongo
+```

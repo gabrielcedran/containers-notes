@@ -287,3 +287,21 @@ docker build -t app-with-mongo .
 
 docker run -it --rm -p 8080:8080 --network=app-net --env MONGO_CONNECTION_STRING=mongodb://mongo_db:27017 app-with-mongo
 ```
+
+### Docker Compose
+
+It's perfect for local use cases, like spinning up different container types in order to have a environment up and running.
+
+`docker-compose` is v1, while `docker compose` v2.
+
+Main attributes:
+
+`build` is the directory where the Dockerfile is, in case it's based on project's source, while `image` is in case it's based on existing external images.
+
+`ports`: exported ports, similarly to docker CLI (to connect from host / to enable containers to connect to each other even without port exporting use `links`).
+
+`environment`: self-explanatory
+
+`links`: enabled networking between the linked containers (same thing though to connect afterwords, it has to use the container's name as the url)
+
+To scale the number of containers, just pass the flag `--scale` with the container name and number of instances. Example: `docker compose up --scale db=10`

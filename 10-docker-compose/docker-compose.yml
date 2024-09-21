@@ -1,0 +1,28 @@
+services:
+  api:
+    build: api
+    # this will be accessed by the browser of the host machine, thus needs to be exposed
+    ports:
+      - "8080:8080"
+    # notice that netween containers, it's not necessary to expose ports. Just creating the link is enough
+    links:
+      - db
+    environment:
+      MONGO_CONNECTION_STRING: mongodb://db:27017
+  db:
+    # this mongo instance is accessible by the api via docker network, but it's not to web nor the host machine
+    image: mongo:7
+  web:
+    # this is an nginx that serves the statics to the browser. But this container itself never connects to the api.
+    build: web
+    environment:
+      API_URL: http://api:8080
+    ports:
+      - "8081:80"
+# this is the same as running the following docker cli commands:
+# docker network create --driver=bridge 10-docker-compose
+# docker run -d --rm --name db --network 10-docker-compose mongo:7
+# docker build api/ -t api
+# docker run -d --name api -p 8080:8080 --network=10-docker-compose --env Mnv MONGO_CONNECTION_STRING=mongodb://db:27017 api
+# docker build web/ -t web
+# docker run --rm -d --name web -p 8081:80 web

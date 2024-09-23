@@ -1,0 +1,37 @@
+services:
+  api:
+    build: api
+    # this will be accessed by the browser of the host machine, thus needs to be exposed
+    ports:
+      - "8080:8080"
+    # notice that netween containers, it's not necessary to expose ports. Just creating the link is enough
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      MONGO_CONNECTION_STRING: mongodb://db:27017
+    labels:
+      kompose.service.type: nodeport # this is meant to enable scaling - kubernetes will make sure to bind different ports and load balance. Ps: any app can reach port 8080 and b8s spread the load across.
+      kompose.image-pull-policy: Never
+  db:
+    # this mongo instance is accessible by the api via docker network, but it's not to web nor the host machine
+    image: mongo:7
+    ports:
+      - "27017:27017"
+  web:
+    # this is an nginx that serves the statics to the browser. But this container itself never connects to the api.
+    build: web
+    links:
+      - api
+    depends_on:
+      - api
+    environment:
+      API_URL: http://api:8080
+    ports:
+      - "8081:80"
+    labels:
+      kompose.service.type: LoadBalancer # this is meant to let k8s know that it has to expose this service to the outside world (it spins up a load balancer). LoadBalancer is just a special type of nodeport
+      # More here: https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0
+      kompose.service.expose: true
+      kompose.image-pull-policy: Never

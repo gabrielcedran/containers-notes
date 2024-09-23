@@ -305,3 +305,44 @@ Main attributes:
 `links`: enabled networking between the linked containers (same thing though to connect afterwords, it has to use the container's name as the url)
 
 To scale the number of containers, just pass the flag `--scale` with the container name and number of instances. Example: `docker compose up --scale db=10`
+
+### Kubernetes
+
+Concepts:
+
+**control plane**: is a server that coordinates everything within the cluster (sometimes referenced as the `master node`) - it scales up and down containers, monitors crashes and triggers restarts, etc.
+Many cloud providers don't charge you to run the control plane (e.g Azure and Google) - basically the compute that is used by it.
+
+**nodes**: individual workers that actually run the containers - one node can run multiple containers. There might be a one to one relationship between node and machine. It's where the containers are being deployed, usually
+a VM.
+
+**pod**: is a group of nodes that usually have to run together (e.g an app and a sidecar) and are inseparable.
+
+**service**: is a group of pods that make up one backend or frontend.
+
+**deployment**: is the description of what you want the state of your pods to be so that k8s can get your cluster into that state.
+
+`kubectl` is just a CLI to control a k8s instance.
+
+When running on your localhost, you can choose between `minikube` and `Docker Desktop` (which has built in k8s support). It's possible to have both installed and switch between them (`kubectl config use-context minikube` <> `kubectl config use-context docker-desktop` - shorten `use-context` to `use`). _it's the same when using a cloud provider_
+
+Setting up kubernetes on Docker Desktop:
+
+1. click on the gear icon
+2. open kubernetes tab
+3. tick the `enable kubernetes` checkbok
+4. apply and restart
+
+`kubectl cluster-info`
+
+`kubectl get all`
+
+#### Kompose
+
+It's a nice project to get developers started with k8s. It transforms a docker-compose file into kubernetes configuration. It's meant to be a one-off use and then once it's converted you enter maintenance mode.
+
+_typically k8s want to pull from a registry not your local computer, therefore it's necessary to instruct it if that is the case_
+
+`kompose convert --build local`
+
+`kubectl apply -f conf.yaml`
